@@ -30,27 +30,27 @@ function getValidationResults(errors: FormErrors) {
   return { hasErrors: Object.keys(filteredErrors).length > 0, errors: filteredErrors };
 }
 
-export function validateValues(
+export async function validateValues(
   rules: FormRules<any>,
   values: Record<string, any>
-): FormValidationResult {
+): Promise<FormValidationResult> {
   if (rules === undefined || rules === null) {
     return { hasErrors: false, errors: {} };
   }
 
   if (typeof rules === 'function') {
-    return getValidationResults(rules(values));
+    return getValidationResults(await rules(values));
   }
 
   return getValidationResults(validateRecordRules(rules, values));
 }
 
-export function validateFieldValue(
+export async function validateFieldValue(
   field: string,
   rules: FormRules<any>,
   values: Record<string, any>
-): FormFieldValidationResult {
-  const results = validateValues(rules, values);
+): Promise<FormFieldValidationResult> {
+  const results = await validateValues(rules, values);
   const hasError = field in results.errors;
   return { hasError, error: hasError ? results.errors[field] : null };
 }

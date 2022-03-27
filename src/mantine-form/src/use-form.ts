@@ -17,7 +17,7 @@ export interface UseFormInput<T> {
   initialValues: T;
   initialErrors?: FormErrors;
   validate?: FormRules<T>;
-  schema?: (values: Record<string, any>) => FormErrors;
+  schema?: (values: Record<string, any>) => Promise<FormErrors> | FormErrors;
 }
 
 export interface UseFormReturnType<T> {
@@ -40,11 +40,11 @@ export interface UseFormReturnType<T> {
   ) => void;
   removeListItem: <K extends keyof T>(field: K, indices: number[] | number) => void;
   reorderListItem: <K extends keyof T>(field: K, payload: { from: number; to: number }) => void;
-  validate(): FormValidationResult;
-  validateField: (field: string) => FormFieldValidationResult;
+  validate(): Promise<FormValidationResult>;
+  validateField: (field: string) => Promise<FormFieldValidationResult>;
   onSubmit(
     handleSubmit: (values: T, event: React.FormEvent) => void
-  ): (event?: React.FormEvent) => void;
+  ): (event?: React.FormEvent) => Promise<void>;
   reset(): void;
   getInputProps: <K extends keyof T, L extends GetInputPropsFieldType = 'input'>(
     field: K,
@@ -140,22 +140,23 @@ export function useForm<T extends { [key: string]: any }>({
     }
   };
 
-  const validate = () => {
-    const results = validateValues(schema || rules, values);
+  const validate = async () => {
+    const results = await validateValues(schema || rules, values);
     setErrors(results.errors);
     return results;
   };
 
-  const validateField = (field: string) => {
-    const results = validateFieldValue(field, schema || rules, values);
+  const validateField = async (field: string) => {
+    const results = await validateFieldValue(field, schema || rules, values);
     results.hasError ? setFieldError(field, results.error) : clearFieldError(field);
     return results;
   };
 
   const onSubmit =
-    (handleSubmit: (values: T, event: React.FormEvent) => void) => (event: React.FormEvent) => {
+    (handleSubmit: (values: T, event: React.FormEvent) => void) =>
+    async (event: React.FormEvent) => {
       event.preventDefault();
-      const results = validate();
+      const results = await validate();
       !results.hasErrors && handleSubmit(values, event);
     };
 

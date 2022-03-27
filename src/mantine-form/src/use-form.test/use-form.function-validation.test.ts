@@ -2,7 +2,7 @@ import { renderHook, act } from '@testing-library/react-hooks';
 import { useForm } from '../index';
 
 describe('@mantine/form/use-form function validation', () => {
-  it('validates all fields with validate handler', () => {
+  it('validates all fields with validate handler', async () => {
     const hook = renderHook(() =>
       useForm({
         initialValues: {
@@ -19,8 +19,8 @@ describe('@mantine/form/use-form function validation', () => {
 
     expect(hook.result.current.errors).toStrictEqual({});
 
-    act(() => {
-      const result = hook.result.current.validate();
+    await act(async () => {
+      const result = await hook.result.current.validate();
       expect(result).toStrictEqual({
         hasErrors: true,
         errors: {
@@ -36,8 +36,8 @@ describe('@mantine/form/use-form function validation', () => {
     });
 
     act(() => hook.result.current.setFieldValue('banana', 'test-banana'));
-    act(() => {
-      const result = hook.result.current.validate();
+    await act(async () => {
+      const result = await hook.result.current.validate();
       expect(result).toStrictEqual({
         hasErrors: true,
         errors: { orange: 'invalid orange' },
@@ -47,15 +47,15 @@ describe('@mantine/form/use-form function validation', () => {
     expect(hook.result.current.errors).toStrictEqual({ orange: 'invalid orange' });
 
     act(() => hook.result.current.setFieldValue('orange', 'test-orange'));
-    act(() => {
-      const result = hook.result.current.validate();
+    await act(async () => {
+      const result = await hook.result.current.validate();
       expect(result).toStrictEqual({ hasErrors: false, errors: {} });
     });
 
     expect(hook.result.current.errors).toStrictEqual({});
   });
 
-  it('validates single field with validateField handler', () => {
+  it('validates single field with validateField handler', async () => {
     const hook = renderHook(() =>
       useForm({
         initialValues: {
@@ -70,16 +70,16 @@ describe('@mantine/form/use-form function validation', () => {
       })
     );
 
-    act(() => {
-      const result = hook.result.current.validateField('banana');
+    await act(async () => {
+      const result = await hook.result.current.validateField('banana');
       expect(result).toStrictEqual({ hasError: true, error: 'invalid banana' });
     });
 
     expect(hook.result.current.errors).toStrictEqual({ banana: 'invalid banana' });
 
     act(() => hook.result.current.setFieldValue('banana', 'test-banana'));
-    act(() => {
-      const result = hook.result.current.validateField('banana');
+    await act(async () => {
+      const result = await hook.result.current.validateField('banana');
       expect(result).toStrictEqual({ hasError: false, error: null });
     });
 

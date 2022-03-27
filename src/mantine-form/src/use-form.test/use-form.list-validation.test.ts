@@ -11,7 +11,7 @@ const banana: Fruit = { name: 'banana', price: 50, stock: 11 };
 const orange: Fruit = { name: 'orange', price: 5, stock: 5 };
 
 describe('@mantine/form/use-form list validation', () => {
-  it('validates form list with given object', () => {
+  it('validates form list with given object', async () => {
     const hook = renderHook(() =>
       useForm({
         initialValues: { fruits: formList([banana, orange]) },
@@ -24,8 +24,8 @@ describe('@mantine/form/use-form list validation', () => {
       })
     );
 
-    act(() => {
-      const results = hook.result.current.validate();
+    await act(async () => {
+      const results = await hook.result.current.validate();
       expect(results).toStrictEqual({
         hasErrors: true,
         errors: {
@@ -43,20 +43,20 @@ describe('@mantine/form/use-form list validation', () => {
     });
   });
 
-  it('does not create list errors array if there are no validate rules for the list', () => {
+  it('does not create list errors array if there are no validate rules for the list', async () => {
     const hook = renderHook(() =>
       useForm({ initialValues: { fruits: formList([banana, orange]) }, validate: {} })
     );
 
-    act(() => {
-      const results = hook.result.current.validate();
+    await act(async () => {
+      const results = await hook.result.current.validate();
       expect(results).toStrictEqual({ hasErrors: false, errors: {} });
     });
 
     expect(hook.result.current.errors).toStrictEqual({});
   });
 
-  it('correctly handles all valid list values', () => {
+  it('correctly handles all valid list values', async () => {
     const hook = renderHook(() =>
       useForm({
         initialValues: {
@@ -71,15 +71,15 @@ describe('@mantine/form/use-form list validation', () => {
       })
     );
 
-    act(() => {
-      const result = hook.result.current.validate();
+    await act(async () => {
+      const result = await hook.result.current.validate();
       expect(result).toStrictEqual({ hasErrors: false, errors: {} });
     });
 
     expect(hook.result.current.errors).toStrictEqual({});
   });
 
-  it('correctly handles list validation with validateField', () => {
+  it('correctly handles list validation with validateField', async () => {
     const hook = renderHook(() =>
       useForm({
         initialValues: { fruits: formList([banana, orange]) },
@@ -92,8 +92,8 @@ describe('@mantine/form/use-form list validation', () => {
       })
     );
 
-    act(() => {
-      const result = hook.result.current.validateField('fruits.0.name');
+    await act(async () => {
+      const result = await hook.result.current.validateField('fruits.0.name');
       expect(result).toStrictEqual({ hasError: true, error: 'invalid fruit' });
     });
 

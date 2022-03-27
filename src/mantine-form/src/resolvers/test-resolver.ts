@@ -35,10 +35,12 @@ const initialValues = {
   ]),
 };
 
-export function testResolver(schema: (values: Record<string, any>) => FormErrors) {
+export function testResolver(
+  schema: (values: Record<string, any>) => Promise<FormErrors> | FormErrors
+) {
   // Resolver itself
-  it('validates given values', () => {
-    expect(schema(values)).toStrictEqual({
+  it('validates given values', async () => {
+    expect(await schema(values)).toStrictEqual({
       name: RESOLVER_ERROR_MESSAGES.name,
       age: RESOLVER_ERROR_MESSAGES.age,
       'fruits.0.stock': RESOLVER_ERROR_MESSAGES.fruitStock,
@@ -46,18 +48,18 @@ export function testResolver(schema: (values: Record<string, any>) => FormErrors
     });
   });
 
-  it('returns empty object if all fields are valid', () => {
-    expect(schema(validValues)).toStrictEqual({});
+  it('returns empty object if all fields are valid', async () => {
+    expect(await schema(validValues)).toStrictEqual({});
   });
 
   // use-form integration
-  it('validates regular values', () => {
+  it('validates regular values', async () => {
     const hook = renderHook(() => useForm({ schema, initialValues }));
 
     expect(hook.result.current.errors).toStrictEqual({});
 
-    act(() => {
-      const results = hook.result.current.validate();
+    await act(async () => {
+      const results = await hook.result.current.validate();
       expect(results).toStrictEqual({
         hasErrors: true,
         errors: {
@@ -77,13 +79,13 @@ export function testResolver(schema: (values: Record<string, any>) => FormErrors
     });
   });
 
-  it('validates single field with validateField handler', () => {
+  it('validates single field with validateField handler', async () => {
     const hook = renderHook(() => useForm({ schema, initialValues }));
 
     expect(hook.result.current.errors).toStrictEqual({});
 
-    act(() => {
-      const results = hook.result.current.validateField('name');
+    await act(async () => {
+      const results = await hook.result.current.validateField('name');
       expect(results).toStrictEqual({ hasError: true, error: RESOLVER_ERROR_MESSAGES.name });
     });
 

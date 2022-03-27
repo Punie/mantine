@@ -11,7 +11,7 @@ export type FormRulesRecord<T> = Partial<{
     : (value: T[P], values: T) => React.ReactNode;
 }>;
 
-export type FormRules<T> = ((values: T) => FormErrors) | FormRulesRecord<T>;
+export type FormRules<T> = ((values: T) => Promise<FormErrors> | FormErrors) | FormRulesRecord<T>;
 
 export interface FormValidationResult {
   hasErrors: boolean;
